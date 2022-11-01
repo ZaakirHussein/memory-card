@@ -3,34 +3,64 @@ import playerObjs from "./playerObjs";
 import DisplayCards from "./DisplayCards";
 
 function Game() {
-  const [playerObjStorage, setPlayerObjStorage] = useState();
+  const [playerCardStorage, setPlayerCardStorage] = useState(playerObjs);
+  const [doneShuffling, setDoneShuffling] = useState(false);
 
-  const randomNoRepeats = async () => {
-    let ninePlayerObjs = [];
-    for (let i = 0; i < 9; i++) {
-      let index = Math.floor(Math.random() * playerObjs.length);
-      let randomPlayerObj = playerObjs[index];
-      if (!ninePlayerObjs.includes(randomPlayerObj)) {
-        ninePlayerObjs.push(randomPlayerObj);
-      }
+  const [clickedCards, setClickedCards] = useState([]);
+
+  const shuffleCardStorage = () => {
+    let currentIndex = playerCardStorage.length,
+      randomIndex;
+
+    while (currentIndex !== 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+
+      [playerCardStorage[currentIndex], playerCardStorage[randomIndex]] = [
+        playerCardStorage[randomIndex],
+        playerCardStorage[currentIndex],
+      ];
     }
-    return setPlayerObjStorage(ninePlayerObjs);
+
+    return playerCardStorage;
+  };
+
+  const handleCardClick = (name) => {
+    const foundCard = playerCardStorage.find(
+      (matchingCard) => matchingCard.name === name
+    );
+
+    const wasCardClicked = clickedCards.some((card) => card.name === name);
+
+    if (!wasCardClicked) {
+      console.log(`adding ${foundCard.name} to clickedCards`);
+      console.log(wasCardClicked);
+
+      return setClickedCards([...clickedCards, foundCard]);
+      // newRound/refresh
+    }
+
+    console.log(` ${foundCard.name} has already been clicked!`);
+    console.log(wasCardClicked);
+
+    // endGame()
   };
 
   useEffect(() => {
-    randomNoRepeats();
+    shuffleCardStorage();
+    setDoneShuffling(true);
+    // add dependency that updates on clickedCards change
   }, []);
 
-  if (!playerObjStorage) {
-    return (
-      <p>
-        ninePlayerObjs is still an empty arr and which means no data being
-        passed to DisplayCards
-      </p>
-    );
+  if (!doneShuffling) {
+    return <div>Loading</div>;
   }
 
-  return <DisplayCards arr={playerObjStorage} />;
+  return (
+    <div className="grid grid-cols-3">
+      <DisplayCards arr={playerCardStorage} onClick={handleCardClick} />
+    </div>
+  );
 }
 
 export default Game;
