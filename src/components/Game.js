@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from "react";
+import Header from "./Header";
 import playerObjs from "./playerObjs";
 import DisplayCards from "./DisplayCards";
 
 function Game() {
+  const [currentScore, setCurrentScore] = useState(0);
+  const [highScore, setHighScore] = useState(0);
+
   const [playerCardStorage, setPlayerCardStorage] = useState(playerObjs);
   const [doneShuffling, setDoneShuffling] = useState(false);
-
   const [clickedCards, setClickedCards] = useState([]);
+
+  const handleToggle = () => {
+    setDoneShuffling((prev) => ({ ...prev, doneShuffling: true }));
+  };
 
   const shuffleCardStorage = () => {
     let currentIndex = playerCardStorage.length,
@@ -25,6 +32,20 @@ function Game() {
     return playerCardStorage;
   };
 
+  const newRound = () => {
+    setCurrentScore(currentScore + 1);
+    // shuffleCardStorage();
+  };
+
+  const endGame = () => {
+    if (currentScore > highScore) {
+      setHighScore(currentScore);
+      setClickedCards([]);
+    }
+    setClickedCards([]);
+    return setCurrentScore(0);
+  };
+
   const handleCardClick = (name) => {
     const foundCard = playerCardStorage.find(
       (matchingCard) => matchingCard.name === name
@@ -36,29 +57,34 @@ function Game() {
       console.log(`adding ${foundCard.name} to clickedCards`);
       console.log(wasCardClicked);
 
-      return setClickedCards([...clickedCards, foundCard]);
+      setClickedCards([...clickedCards, foundCard]);
+      return newRound();
       // newRound/refresh
     }
 
     console.log(` ${foundCard.name} has already been clicked!`);
     console.log(wasCardClicked);
-
-    // endGame()
+    alert("The game has ended");
+    return endGame();
   };
 
   useEffect(() => {
+    document.title = "Memory Card Game";
     shuffleCardStorage();
-    setDoneShuffling(true);
-    // add dependency that updates on clickedCards change
-  }, []);
+    handleToggle();
+    // add dependency that updates on clickedCards & currentScore change
+  }, [clickedCards, currentScore]);
 
   if (!doneShuffling) {
     return <div>Loading</div>;
   }
 
   return (
-    <div className="grid grid-cols-3">
-      <DisplayCards arr={playerCardStorage} onClick={handleCardClick} />
+    <div className="flex items-center flex-col">
+      <Header currentScore={currentScore} highScore={highScore} />
+      <div className="grid grid-cols-3 gap-2 place-items-center	w-1/2">
+        <DisplayCards arr={playerCardStorage} onClick={handleCardClick} />
+      </div>
     </div>
   );
 }
