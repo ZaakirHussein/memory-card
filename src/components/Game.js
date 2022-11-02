@@ -34,7 +34,6 @@ function Game() {
 
   const newRound = () => {
     setCurrentScore(currentScore + 1);
-    // shuffleCardStorage();
   };
 
   const endGame = () => {
@@ -54,17 +53,10 @@ function Game() {
     const wasCardClicked = clickedCards.some((card) => card.name === name);
 
     if (!wasCardClicked) {
-      console.log(`adding ${foundCard.name} to clickedCards`);
-      console.log(wasCardClicked);
-
       setClickedCards([...clickedCards, foundCard]);
       return newRound();
-      // newRound/refresh
     }
-
-    console.log(` ${foundCard.name} has already been clicked!`);
-    console.log(wasCardClicked);
-    alert("The game has ended");
+    alert("The game has ended, let's start a new round!");
     return endGame();
   };
 
@@ -72,7 +64,6 @@ function Game() {
     document.title = "Memory Card Game";
     shuffleCardStorage();
     handleToggle();
-    // add dependency that updates on clickedCards & currentScore change
   }, [clickedCards, currentScore]);
 
   if (!doneShuffling) {
@@ -80,7 +71,7 @@ function Game() {
   }
 
   return (
-    <div className="flex items-center flex-col">
+    <div className="flex items-center flex-col bg-slate-100	">
       <Header currentScore={currentScore} highScore={highScore} />
       <div className="grid grid-cols-3 gap-2 place-items-center	w-1/2">
         <DisplayCards arr={playerCardStorage} onClick={handleCardClick} />
