@@ -33,7 +33,7 @@ function Game() {
   };
 
   const newRound = () => {
-    setCurrentScore(currentScore + 1);
+    setCurrentScore((currentScore) => currentScore + 1);
   };
 
   const endGame = () => {
